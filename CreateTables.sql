@@ -38,21 +38,22 @@ CREATE TABLE Auditors (
 	auditorFirstName varchar(50),
 	auditorLastName varchar(50),
 	ManagerID int FOREIGN KEY REFERENCES Managers(ManagerID),
-	EmployeeStatus varchar(10)
+	EmployeeStatus varchar(10),
+	HourlyRate smallmoney
 )
 
-insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus) values ( 1000, 'Michel', 'Pauling', 100, 'Active');
-insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus) values ( 1001, 'Talbot', 'Rich', 110, 'Active');
-insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus) values ( 1002, 'Chris', 'Thynne', 110, 'Active');
-insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus) values ( 1003, 'Whitney', 'Addey', 100, 'Active');
-insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus) values ( 1004, 'Brian', 'Pugh', 120, 'Active');
-insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus) values ( 1005, 'Bennie', 'Dunham', 120, 'Active');
-insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus) values ( 1006, 'Adan', 'Waitland', 110, 'Active');
-insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus) values ( 1007, 'Renee', 'Heed', 100, 'Active');
-insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus) values ( 1008, 'Wesley', 'Smith', 100, 'Inactive');
 
-SELECT *
-FROM Auditors
+insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus, HourlyRate) values ( 1000, 'Michel', 'Pauling', 100, 'Active', 14.50);
+insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus, HourlyRate) values ( 1001, 'Talbot', 'Rich', 110, 'Active', 12.00);
+insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus, HourlyRate) values ( 1002, 'Chris', 'Thynne', 110, 'Active', 13.50);
+insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus, HourlyRate) values ( 1003, 'Whitney', 'Addey', 100, 'Active', 15.25);
+insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus, HourlyRate) values ( 1004, 'Brian', 'Pugh', 120, 'Active', 12.37);
+insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus, HourlyRate) values ( 1005, 'Bennie', 'Dunham', 120, 'Active', 13.89);
+insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus, HourlyRate) values ( 1006, 'Adan', 'Waitland', 110, 'Active', 14.50);
+insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus, HourlyRate) values ( 1007, 'Renee', 'Heed', 100, 'Active', 15.23);
+insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus, HourlyRate) values ( 1008, 'Wesley', 'Smith', 100, 'Inactive', 12.98);
+insert into Auditors (AuditorID, auditorFirstName, auditorLastName, ManagerID, EmployeeStatus, HourlyRate) values ( 1009, 'Gene', 'Watson', null, 'Active', 14.78);
+
 
 CREATE TABLE locationAudits (
 	auditID int PRIMARY KEY,
@@ -167,6 +168,104 @@ insert into locationAudits (auditID, WHSLoc, SKU, Client, AuditorID, ExpQty, Cou
 insert into locationAudits (auditID, WHSLoc, SKU, Client, AuditorID, ExpQty, CountedQty, ErrorID, AuditDate) values (17103, 1274, 835713654, 'Beauty Products Inc', 1004, 85, 42, 4, '2019-12-02 20:27:00');
 insert into locationAudits (auditID, WHSLoc, SKU, Client, AuditorID, ExpQty, CountedQty, ErrorID, AuditDate) values (19233, 1274, 299224252, 'Beauty Products Inc', 1004, 18, 8, 1, '2020-05-09 06:15:37');
 
+--Write a SELECT query that uses a WHERE clause
+SELECT *
+FROM locationAudits
+WHERE Client = 'Pillow Co'
+
+--Write a SELECT query that uses an OR and an AND operator
+SELECT * FROM locationAudits
+WHERE Client = 'Dog Supplies Inc' AND (AuditorID = 1001 OR AuditorID =1003);
+
+--Write a SELECT query that filters NULL rows using IS NOT NULL
+SELECT SKU, Client, ErrorID
+FROM locationAudits
+WHERE ErrorID IS NOT NULL;
+
+--Write a DML statement that UPDATEs a set of rows with a WHERE clause.  The values used in the WHERE clause should be a variable
+DECLARE @clientname varchar(50) = 'Beauty Products Inc'
+UPDATE locationAudits
+SET Client = 'Beauty Inc'
+WHERE Client = @clientname
+
+--Write a DML statement that DELETEs a set of rows with a WHERE clause.  The values used in the WHERE clause should be a variable
+DECLARE @inventory_managers varchar(50) = 'Inventory'
+DELETE FROM Managers WHERE Department <> @inventory_managers 
+
+--Write a DML statement that DELETEs rows from a table that another table references.  This script will have to also DELETE any records that reference these rows.  Both of the DELETE statements need to be wrapped in a single transaction.
+--**REVIEW - better choice for this one?
+
+BEGIN TRANSACTION
+	DELETE FROM locationAudits
+	WHERE AuditorID = 1004
+
+	DELETE FROM Auditors
+	WHERE AuditorID = 1004
+
+COMMIT;
+
+--Write a SELECT query that utilizes a JOIN
+SELECT locationAudits.auditID, Auditors.auditorFirstName + ' ' + Auditors.auditorLastName, locationAudits.AuditDate
+FROM locationAudits
+JOIN Auditors ON locationAudits.AuditorID = Auditors.AuditorID
+
+--Write a SELECT query that utilizes a JOIN with 3 or more tables
+SELECT la.auditID, a.auditorFirstName + ' ' + a.auditorLastName, m.managerFirstName + '  ' + m.managerLastName
+FROM locationAudits la
+JOIN Auditors a
+ON la.AuditorID = a.AuditorID
+JOIN Managers m
+ON m.ManagerID = a.ManagerID
+
+--Write a SELECT query that utilizes a LEFT JOIN
+SELECT a.AuditorID, a.auditorFirstName + ' ' + a.auditorLastName, m.ManagerFirstName + ' ' + m.ManagerLastName
+FROM Auditors a
+LEFT JOIN Managers m
+ON a.ManagerID = m.ManagerID
+
+--Write a SELECT query that utilizes a variable in the WHERE clause
+DECLARE @good_audits int = 0
+SELECT *
+FROM locationAudits
+WHERE ErrorID = @good_Audits
+
+--Write a SELECT query that utilizes a ORDER BY clause
+SELECT * 
+FROM locationAudits
+ORDER BY AuditDate
+
+--Write a SELECT query that utlizies a GROUP BY clause along with an aggregate function
+SELECT ErrorID, COUNT(*)
+FROM locationAudits
+GROUP BY ErrorID;
+
+--Write a SELECT query that utilizes a CALCULATED FIELD
+SELECT auditID, SKU, ErrorID, ExpQty, CountedQty, (CountedQty - ExpQty) AS Adjustment
+FROM locationAudits;
+
+
+--Write a SELECT query that utilizes a SUBQUERY *will show employees earning below active employee average hourly wage
+  SELECT auditorFirstName + ' ' + auditorLastName, ManagerID, HourlyRate
+  FROM Auditors
+  WHERE HourlyRate < (
+	SELECT AVG(HourlyRate)
+	FROM Auditors
+	WHERE EmployeeStatus = 'Active'
+  )
+
+
+--Write a SELECT query that utliizes a JOIN, at least 2 OPERATORS (AND, OR, =, IN, BETWEEN, ETC) AND A GROUP BY clause with and aggregate function
+SELECT m.ManagerID, la.auditID, la.SKU, la.AuditorID
+FROM locationAudits la
+JOIN Managers m
+
+Select *
+FROM Auditors
+
+--Write a SELECT query that utilizes a JOIN with 3 or more tables, at least 2 OPERATORS (AND, OR, =, IN, BETWEEN, ETC.) a GROUP BY clause with an aggregate function and a HAVING clause
+--Design a NONCLUSTERED INDEX with ONE KEY COLUMN that improves the perfomance of one of the above queries
+--Design a NONCLUSTERED INDEX with TWO KEY COLUMNS that improves the performance of one of the above queries
+--Design a NONCLUSTERED INDEX with at least one key column and at least on included column that improves the performance of one of the above queries
 
 
 
