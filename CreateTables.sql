@@ -521,11 +521,17 @@ GROUP BY la.AuditorID, a.AuditorFirstName + ' ' + a.auditorLastName, m.managerLa
 HAVING COUNT(la.AuditorID) > 20
 
 --Design a NONCLUSTERED INDEX with ONE KEY COLUMN that improves the perfomance of one of the above queries
-CREATE NONCLUSTERED INDEX IX_locationAudits_AuditorID
-ON locationAudits (AuditorID)
+CREATE NONCLUSTERED INDEX IX_Managers_managerLastName
+ON Managers (managerLastName)
 
 --Design a NONCLUSTERED INDEX with TWO KEY COLUMNS that improves the performance of one of the above queries
+CREATE NONCLUSTERED INDEX IX_Auditors_fullname
+ON Auditors (auditorFirstName, auditorLastName)
+
 --Design a NONCLUSTERED INDEX with at least one key column and at least on included column that improves the performance of one of the above queries
+CREATE NONCLUSTERED INDEX IX_Auditors_EmployeeStatus
+ON Auditors (EmployeeStatus)
+INCLUDE (HourlyRate);
 
 
 
