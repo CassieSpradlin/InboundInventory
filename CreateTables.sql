@@ -4,20 +4,18 @@ GO
 USE InboundInventory
 GO
 
---One-To-Many table - one manager to many employees
 CREATE TABLE Managers (
 	ManagerID int PRIMARY KEY,
 	managerFirstName varchar(50),
 	managerLastName varchar(50),
-	Department varchar(50)
-	
+	Department varchar(50)	
 )
 
-insert into Managers (ManagerID, managerFirstName, managerLastName, Department) values (100, 'Jamie', 'Smith', 'Inventory');
-insert into Managers (ManagerID, managerFirstName, managerLastName, Department) values (110, 'Lisa', 'Redmond', 'Inventory');
-insert into Managers (ManagerID, managerFirstName, managerLastName, Department) values (120, 'William', 'Redd', 'Inventory');
-insert into Managers (ManagerID, managerFirstName, managerLastName, Department) values (131, 'Susan', 'Willis', 'Inbound');
-insert into Managers (ManagerID, managerFirstName, managerLastName, Department) values (122, 'Russell', 'Jones', 'Outbound');
+insert into Managers(ManagerID, managerFirstName, managerLastName, Department) values (100, 'Jamie', 'Smith', 'Inventory');
+insert into Managers(ManagerID, managerFirstName, managerLastName, Department) values (110, 'Lisa', 'Redmond', 'Inventory');
+insert into Managers(ManagerID, managerFirstName, managerLastName, Department) values (120, 'William', 'Redd', 'Inventory');
+insert into Managers(ManagerID, managerFirstName, managerLastName, Department) values (131, 'Susan', 'Willis', 'Inbound');
+insert into Managers(ManagerID, managerFirstName, managerLastName, Department) values (122, 'Russell', 'Jones', 'Outbound');
 
 CREATE TABLE auditErrors (
 	ErrorID int PRIMARY KEY,
@@ -445,18 +443,22 @@ BEGIN TRANSACTION
 	DELETE FROM locationAudits
 	WHERE AuditorID = 1004
 
+	DELETE FROM employeeHours
+	WHERE AuditorID = 1004
+
 	DELETE FROM Auditors
 	WHERE AuditorID = 1004
 
 COMMIT;
 
+
 --Write a SELECT query that utilizes a JOIN
-SELECT locationAudits.auditID, Auditors.auditorFirstName + ' ' + Auditors.auditorLastName, locationAudits.AuditDate
+SELECT locationAudits.auditID, Auditors.auditorFirstName + ' ' + Auditors.auditorLastName AS auditorFullName, locationAudits.AuditDate
 FROM locationAudits
 JOIN Auditors ON locationAudits.AuditorID = Auditors.AuditorID
 
 --Write a SELECT query that utilizes a JOIN with 3 or more tables
-SELECT la.auditID, a.auditorFirstName + ' ' + a.auditorLastName, m.managerFirstName + '  ' + m.managerLastName
+SELECT la.auditID, a.auditorFirstName + ' ' + a.auditorLastName AS auditorFullName, m.managerFirstName + '  ' + m.managerLastName AS managerFullName
 FROM locationAudits la
 JOIN Auditors a
 ON la.AuditorID = a.AuditorID
@@ -464,7 +466,7 @@ JOIN Managers m
 ON m.ManagerID = a.ManagerID
 
 --Write a SELECT query that utilizes a LEFT JOIN
-SELECT a.AuditorID, a.auditorFirstName + ' ' + a.auditorLastName, m.ManagerFirstName + ' ' + m.ManagerLastName
+SELECT a.AuditorID, a.auditorFirstName + ' ' + a.auditorLastName AS auditorFullName, m.ManagerFirstName + ' ' + m.ManagerLastName AS managerFullName
 FROM Auditors a
 LEFT JOIN Managers m
 ON a.ManagerID = m.ManagerID
@@ -481,7 +483,7 @@ FROM locationAudits
 ORDER BY AuditDate
 
 --Write a SELECT query that utlizies a GROUP BY clause along with an aggregate function
-SELECT ErrorID, COUNT(*)
+SELECT ErrorID, COUNT(*) AS countofErrors
 FROM locationAudits
 GROUP BY ErrorID;
 
@@ -491,7 +493,7 @@ FROM locationAudits;
 
 
 --Write a SELECT query that utilizes a SUBQUERY *will show employees earning below active employee average hourly wage
-  SELECT auditorFirstName + ' ' + auditorLastName, ManagerID, HourlyRate
+  SELECT auditorFirstName + ' ' + auditorLastName AS auditorFullName, ManagerID, HourlyRate
   FROM Auditors
   WHERE HourlyRate < (
 	SELECT AVG(HourlyRate)
@@ -534,8 +536,11 @@ ON Auditors (EmployeeStatus)
 INCLUDE (HourlyRate);
 
 
-
-
+DROP TABLE locationAudits
+DROP TABLE employeeHours
+DROP TABLE auditErrors
+DROP TABLE Auditors
+DROP TABLE Managers
 
 
 
