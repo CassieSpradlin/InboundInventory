@@ -420,7 +420,8 @@ FROM locationAudits
 WHERE Client = 'Pillow Co'
 
 --Write a SELECT query that uses an OR and an AND operator
-SELECT * FROM locationAudits
+SELECT * 
+FROM locationAudits
 WHERE Client = 'Dog Supplies Inc' AND (AuditorID = 1001 OR AuditorID =1003);
 
 --Write a SELECT query that filters NULL rows using IS NOT NULL
@@ -470,6 +471,7 @@ SELECT a.AuditorID, a.auditorFirstName + ' ' + a.auditorLastName AS auditorFullN
 FROM Auditors a
 LEFT JOIN Managers m
 ON a.ManagerID = m.ManagerID
+WHERE m.ManagerFirstName = 'William' AND m.ManagerLastName = 'Redd'
 
 --Write a SELECT query that utilizes a variable in the WHERE clause
 DECLARE @good_audits int = 0
@@ -523,12 +525,12 @@ GROUP BY la.AuditorID, a.AuditorFirstName + ' ' + a.auditorLastName, m.managerLa
 HAVING COUNT(la.AuditorID) > 20
 
 --Design a NONCLUSTERED INDEX with ONE KEY COLUMN that improves the perfomance of one of the above queries
-CREATE NONCLUSTERED INDEX IX_Managers_managerLastName
-ON Managers (managerLastName)
+CREATE NONCLUSTERED INDEX IX_locationAudits_Client
+ON locationAudits (Client)
 
 --Design a NONCLUSTERED INDEX with TWO KEY COLUMNS that improves the performance of one of the above queries
-CREATE NONCLUSTERED INDEX IX_Auditors_fullname
-ON Auditors (auditorFirstName, auditorLastName)
+CREATE NONCLUSTERED INDEX IX_Managers_fullname
+ON Managers (ManagerFirstName, ManagerLastName)
 
 --Design a NONCLUSTERED INDEX with at least one key column and at least on included column that improves the performance of one of the above queries
 CREATE NONCLUSTERED INDEX IX_Auditors_EmployeeStatus
