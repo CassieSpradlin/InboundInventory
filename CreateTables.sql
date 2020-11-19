@@ -452,7 +452,6 @@ BEGIN TRANSACTION
 
 COMMIT;
 
-
 --Write a SELECT query that utilizes a JOIN
 SELECT [dbo].[locationAudits].[auditID], [dbo].[Auditors].[auditorFirstName] + ' ' + [dbo].[Auditors].[auditorLastName] AS auditorFullName, [dbo].[locationAudits].[AuditDate]
 FROM [dbo].[locationAudits]
@@ -537,12 +536,6 @@ CREATE NONCLUSTERED INDEX IX_Auditors_EmployeeStatus
 ON [dbo].[Auditors] ([EmployeeStatus])
 INCLUDE ([HourlyRate]);
 
-
-DROP TABLE [dbo].[locationAudits]
-DROP TABLE [dbo].[employeeHours]
-DROP TABLE [dbo].[auditErrors]
-DROP TABLE [dbo].[Auditors]
-DROP TABLE [dbo].[Managers]
 
 
 
